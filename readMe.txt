@@ -2,7 +2,7 @@
 /*********************************************************
  *		ReadMe for TREC Engine			 				 *
  *                                                       * 
- *  Jerry Lee                                            *
+ *  SaturdayAM                                           *
  *********************************************************/
 A search engine with relevance feedback query expansion.
 Retrieves over NIST Text Retrieval Conference test collections.

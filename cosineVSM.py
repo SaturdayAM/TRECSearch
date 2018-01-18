@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  4 14:28:32 2016
+Translates documents and queries into vector space. Calculates and ranks
+searches by cosine similarity scores.
 
-@author: jerry
 """
 import numpy as np
 import re
@@ -12,7 +12,6 @@ import operator
 
 class cosineVSM():
     
-    
     def __init__(self, parsedQueries, indexPath, outputPath, corpusPath):
         self.parsedQueries = parsedQueries
         self.index = np.load(indexPath).item()
@@ -20,7 +19,6 @@ class cosineVSM():
         self.corpusPath = corpusPath       
         
     def getLexicon(self, lexiconPath):
-        print("Getting lexicon from: " + lexiconPath)
         self.lexicon = np.load(lexiconPath).item()
             
         #Regex to extracts the tokens of the documents

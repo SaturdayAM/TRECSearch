@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Parses all files in folder path and writes to disk a parsed corpus
+in the form: (DocNO [Parsed Tokens])
+    
+"""
 import re
 import os
 import datetime
@@ -7,21 +12,12 @@ import numpy as np
 import json
 
 class folderParser():
-    """
-    Parses all files in folder path and writes to disk a parsed corpus
-    in the form: (DocNO [Parsed Tokens])
-    
-    """
-
-
     def __init__(self, folderPath, outputPath):
         self.outputPath = outputPath
         self.folderPath = folderPath
         self.docNos = []
         self.docTexts = []
         self.specialTokens = []
-      
-      
       
     #--------------------------------------------------------------------------     
     #                        Main Parse Function 
@@ -155,15 +151,9 @@ class folderParser():
     #--------------------------Constructs the Lexicon---------------------------
 
     """        
-    #   Builds a lexicon containing all unique tokens and a counter value
-    #   termID becomes token_countervalue
-    #   used a python dictionary
-    #   Refered to the following sources for dictionary functions/traversal:
-    #       https://www.mkyong.com/python/python-how-to-loop-a-dictionary/
-    #       http://stackoverflow.com/questions/3496518/python-using-a-dictionary-to-count-the-items-in-a-list
-    #       http://stackoverflow.com/questions/14374568/counting-duplicate-words-in-python-the-fastest-way
+       Builds lexicon containing all unique tokens and their count
+       termID becomes token_countervalue  
     """
-       
     def buildLexicon(self):       
         lexicon = dict()
         docFrequency = dict()        
@@ -175,19 +165,12 @@ class folderParser():
                     lexicon[token] = tokenIndexer
                     tokenIndexer += 1
                 docFrequency[token] = docFrequency.get(token, 0) + 1
-                
-                
-        #Saving the lexicon using numpy
-        #Looked up how to do so at: 
-        #   http://stackoverflow.com/questions/19201290/how-to-save-a-dictionary-to-a-file-in-python
+                                
+        #Save lexicon as .npy and .json files
         print("Saving lexicon to: middleFiles/lexicon.npy")
         np.save("middleFiles/lexicon.npy", lexicon)         
-        
-        #Also saving lexicon to json
-        #Looked up how to do so at:
-        #   http://stackoverflow.com/questions/11026959/python-writing-dict-to-txt-file-and-reading-dict-from-txt-file
         json.dump(lexicon, open("middleFiles/lexicon.txt", 'w'))
-        
+
         return lexicon
         
         
