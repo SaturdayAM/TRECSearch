@@ -7,10 +7,21 @@
 A search engine with relevance feedback query expansion.
 Retrieves over NIST Text Retrieval Conference test collections.
 
-Components of the project include:
- tokenization, indexing, 
+Built with Python 3
+
+Components of the project include: tokenization, indexing, 
 query processing, cosine vector space relevance ranking, and 
 pseudo-relevance feedback query expansion. 
+
+Execution steps:
+1. begin.py --> Parses the corpus, constructs a lexicon, and 
+   				builds a single term index by extracting and 
+   				sorting triples lists.
+
+2.   
+
+
+
 
 Run from command line:
 python queryExpansion.py [N feedback docs] [T top terms]

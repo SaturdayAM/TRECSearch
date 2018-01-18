@@ -14,8 +14,6 @@ class folderParser():
     """
 
 
-
-
     def __init__(self, folderPath, outputPath):
         self.outputPath = outputPath
         self.folderPath = folderPath
@@ -25,21 +23,8 @@ class folderParser():
       
       
       
-          
-    #---------------------------------Main Parse Function ---------------------
-    #   Looked at regex for files in:
-    #   http://stackoverflow.com/questions/10477294/how-do-i-search-for-a-pattern-within-a-text-file-using-python-combining-regex
-    #   http://stackoverflow.com/questions/6434823/python-list-everything-between-two-tags
-    #   https://regex101.com/
-    #
-    #   Looked at replacing regex matches at:
-    #   https://en.wikibooks.org/wiki/Python_Programming/Regular_Expression#Replacing
-    #
-    #   Looked at removing whitespaces and newlines at:
-    #   http://stackoverflow.com/questions/16566268/remove-all-line-breaks-from-a-long-string-of-text
-    #
-    #   Looked at case-folding at: 
-    #   http://stackoverflow.com/questions/6797984/how-to-convert-string-to-lowercase-in-python             
+    #--------------------------------------------------------------------------     
+    #                        Main Parse Function 
     #--------------------------------------------------------------------------
     def parse(self):
         #Regular expressions to extract tags
@@ -70,10 +55,11 @@ class folderParser():
                 self.docTexts.append(newString)
         
         
-        #--------------------Parsing escape sequences--------------------------
-        #   Allows for more accurate handling of special case terms
-        #----------------------------------------------------------------------
-        #Escape sequence patterns
+        #---------------------Parsing escape sequences-------------------------
+        """
+        Allows for more accurate handling of special case terms
+        Escape sequence patterns
+        """
         hyphens = re.compile("&hyph;")
         ampersands = re.compile("&amp;")
         sections = re.compile("&sect;")
@@ -89,13 +75,9 @@ class folderParser():
             self.docTexts[i] = escapeless
             
             
-        #------------------------Handling numbers------------------------------
-        #   Learned removing commas from numbers in strings with regex from:
-        #   http://stackoverflow.com/questions/11870399/python-regex-find-numbers-with-comma-in-string
-        #
-        #   Learned removing unecessary decimals, i.e. 500.0000, with regex from:
-        #   https://bytes.com/topic/python/answers/856127-matching-exactly-4-digit-number-python
-        #----------------------------------------------------------------------
+        #--------------------------Handling numbers----------------------------
+        """Regex patterns for numbers with comas, decimals"""
+
         numCommaPattern = re.compile("(\d),(\d)")
         redunDecPattern = re.compile("(\d)\.0+(?!\d)")
         for i, text in enumerate(self.docTexts):
@@ -104,22 +86,17 @@ class folderParser():
             parsedNumStr = redunDecPattern.sub(r"\1", parsedNumStr)
             self.docTexts[i] = parsedNumStr
         
-        
         #------------------------Handling Special Tokens-----------------------
-        #   Looked up datetime/dateutil from:
-        #   http://stackoverflow.com/questions/19994396/best-way-to-identify-and-extract-dates-from-text-python
-        #   http://stackoverflow.com/questions/3276180/extracting-date-from-a-string-in-python
-        #   http://labix.org/python-dateutil
-        #
-        #   Learned more about digit matching in regex at:
-        #   http://stackoverflow.com/questions/8177143/regex-to-match-a-digit-two-or-four-times
-        #----------------------------------------------------------------------
-        #For dates in the format month name DD, YYYY. Week day names left as normal tokens
-        fullDates = re.compile("(?:January|February|March|April|May|June|July|August|September|October|November|December)(?:\s+|$)[0-9]{1,2},(?:\s+|$)[0-9]{4}")
+        """
+        Handles various tokens that can be found from dates in the documents
+        """
+        fullDates = re.compile("(?:January|February|March|April|May|June|July"
+            "|August|September|October|November|December)(?:\s+|$)[0-9]{1,2},"
+            "(?:\s+|$)[0-9]{4}")
+
         slashDates = re.compile("\s([0-9][0-9]\/[0-9][0-9]\/[0-9]{2,4})")
-#        hyphDates = re.compile("\W*((?:[0-9]|[0-1][0-2])-[0-3][0-9]-[0-9]{2})")
         
-        #Go through each document's text, filter and store special tokens
+        #Traverse each document's text; filter and store special tokens
         for i, document in enumerate(self.docTexts):        
             currentText = self.docTexts[i]
             completes = fullDates.findall(currentText) #Store the full dates
@@ -132,8 +109,6 @@ class folderParser():
             
             #Process with dateutil module
             #Dates are in format MM/DD/YYYY
-            #Conversion function found at: 
-            #http://stackoverflow.com/questions/10624937/convert-datetime-object-to-a-string-of-date-only-in-python
             specTokenString = " "
             if len(dateCollection) > 0:
                 for i, entry in enumerate(dateCollection):
@@ -143,12 +118,8 @@ class folderParser():
             
             self.specialTokens.append(specTokenString) 
     
-                
-        #------------------------Removing Symbols------------------------------
-        #   Run once special tokens have been stored
-        #   Looked up the regular expression on:
-        #   http://stackoverflow.com/questions/875968/how-to-remove-symbols-from-a-string-with-python
-        #----------------------------------------------------------------------
+            
+        #Removing symbols after storing special tokens
         symbolPattern = re.compile("[^\w]")
         for i, text in enumerate(self.docTexts):
             symboless = symbolPattern.sub(' ', self.docTexts[i])
@@ -168,22 +139,22 @@ class folderParser():
         
         
         
-    #----------------------------Writes Parsed Corpus--------------------------   
-    #   Writes the parsed documents onto an intermediate file
-    #  for the indexer to use  
+    #--------------------------------------------------------------------------   
+    #                         Output Parsed Corpus 
     #--------------------------------------------------------------------------        
     def writeParsedDocs(self):
         print("\nWriting parsed docs to: ", self.outputPath, "\n")
-        #Looked at file writing from:
-        #   http://stackoverflow.com/questions/899103/writing-a-list-to-a-file-with-python
         with open(self.outputPath, 'w') as file_handler:
             for i in range(len(self.docTexts)):
-                toWrite = "(" + self.docNos[i] + "[" + self.docTexts[i] + "])\n"
+                toWrite = "(" + self.docNos[i] 
+                          + "[" + self.docTexts[i] + "])\n"
                 file_handler.write(toWrite)
             
            
            
-    #--------------------------Constructs the Lexicon---------------------------        
+    #--------------------------Constructs the Lexicon---------------------------
+
+    """        
     #   Builds a lexicon containing all unique tokens and a counter value
     #   termID becomes token_countervalue
     #   used a python dictionary
@@ -191,7 +162,8 @@ class folderParser():
     #       https://www.mkyong.com/python/python-how-to-loop-a-dictionary/
     #       http://stackoverflow.com/questions/3496518/python-using-a-dictionary-to-count-the-items-in-a-list
     #       http://stackoverflow.com/questions/14374568/counting-duplicate-words-in-python-the-fastest-way
-    #---------------------------------------------------------------------------        
+    """
+       
     def buildLexicon(self):       
         lexicon = dict()
         docFrequency = dict()        
