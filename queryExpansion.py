@@ -40,7 +40,8 @@ initialQueries = initialQParse.parsedQueries
 
 
 #2. Pass the parsed queries to our query expansion algorithm
-queryExpander = pseudoRelater.pseudoRelater(initialQueries, nTopDocs, tTopTerms, indexPath, expandedOutputPath, corpusPath, lexiconPath)
+queryExpander = pseudoRelater.pseudoRelater(initialQueries, nTopDocs, tTopTerms
+				, indexPath, expandedOutputPath, corpusPath, lexiconPath)
 queryExpander.pseudoRelate()
 
 end = time.time()

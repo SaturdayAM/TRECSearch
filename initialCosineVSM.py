@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-CosineVSM retrieval engine that returns an array of N top documents
+Translates documents and queries into vector space. Calculates and ranks
+searches by cosine similarity scores. Returns an array of N top documents
 
-@author: jerry
 """
 import numpy as np
 import re
@@ -12,62 +12,57 @@ import operator
 
 class initialCosineVSM():
     
-    def __init__(self, parsedQueries, nTopDocs, indexPath, corpusPath, lexiconPath):
+    def __init__(self, parsedQueries, nTopDocs, indexPath, corpusPath,
+                 lexiconPath):
         self.parsedQueries = parsedQueries
         self.nTopDocs = int(nTopDocs)
         self.index = np.load(indexPath).item()
         self.corpusPath = corpusPath
         self.lexicon = np.load(lexiconPath).item()
         self.rankArray = []
-    
+
+    #--------------------------------------------------------------------------     
+    #                        Main Retrieval Function 
+    #--------------------------------------------------------------------------
     def retrieve(self):
         print("initialCosineVSM.retrieve()")
-        #For each query in our parsed queries
+
         for query in self.parsedQueries:
-#            print("Retrieving for query: \n")
-#            print(query)
-            
-            #Use dictionary to store document scores
+            #Store document scores on dict, rankings on list
             docScores = dict()
-            
-            #Use list to rank the scores
             docRankings = []
             
-            #Regular expressions to extract IDs from our parsed documents
-            #Putting document IDs in a dictionary to associate with their scores
+            #Regular expressions to extract IDs from parsed docs
+            #Store doc IDs in a dictionary to associate with their scores
             docIDExtract = re.compile("FR[0-9]{6}-[0-9]-[0-9]{5}")
             parsedDocs = open(self.corpusPath)
             numDocs = 0
             for document in parsedDocs:
                 docId = docIDExtract.findall(document)
                 docIdStr = ''.join(docId)
-                #Initialize all scores to 0: numerator, denominator part 1, denominator part 2
-                docScores[docIdStr] = {'numerator': 0, 'denomOne': 0, 'denomTwo': 0, 'finalScore': 0}
+                docScores[docIdStr] = {'numerator': 0, 'denomOne': 0,
+                                       'denomTwo': 0, 'finalScore': 0}
                 numDocs += 1            
             
             
-            #Temporarily store each query in a dictionary
-            #allows for easier access to term frequencies
+            #Temp store each query in a dictionary for access to term freq
             queryNo = 0
             tempQueryDict = dict()
             for i, token in enumerate(query.split()):
-                #Get the query number
+                #Get query no
                 if i == 0:
                     queryNo = str(query.split()[0])
-#                    print("Query Number: " + " " + queryNo)
-                #Count up query term frequencies using a dictionary
+                #Count up query term frequencies
                 else:
                     term = query.split()[i]
 #                    print("Term: " + " " + term)
 #                    termId = self.lexicon[term]
-                    #Case: term is not in the dictionary
                     if term not in tempQueryDict:
                         tempQueryDict[term] = 1
-                    #Case: term occurs more than once
                     else:
                         tempQueryDict[term] += 1
             
-#            print("Calculating denominator query score: ")
+
             queryDenomScore = 0;
             #Calculating denominator score portion for query 
             for term in tempQueryDict:
@@ -78,7 +73,7 @@ class initialCosineVSM():
                 termIdf = 0                
 
                 
-                #If the term is not in the lexicon, then the Df will be 0 and score
+                #If term is not in lexicon, then the Df will be 0 and score
                 #will not be affected
                 if term not in self.lexicon:
                     termDf = 0

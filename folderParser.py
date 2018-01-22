@@ -148,7 +148,7 @@ class folderParser():
             
            
            
-    #--------------------------Constructs the Lexicon---------------------------
+    #--------------------------Constructs the Lexicon--------------------------
 
     """        
        Builds lexicon containing all unique tokens and their count
