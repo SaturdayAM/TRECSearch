@@ -14,14 +14,14 @@ query processing, cosine vector space relevance ranking, and
 pseudo-relevance feedback query expansion. 
 
 Execution steps:
-1. begin.py --> Parses the corpus, constructs a lexicon, and 
-   				builds a single term index by extracting and 
-   				sorting triples lists.
+1. begin.py  
+			Parses the corpus, constructs a lexicon, and 
+   			builds a single term index by extracting and 
+   			sorting triples lists.
 
-2.   
-
-
-
+2. staticQuery.py/queryExpansion.py 
+			Retrieve documents with or without query expansion
+			steps. Uses cosine VSM relevance ranking. 
 
 Run from command line:
 python queryExpansion.py [N feedback docs] [T top terms]
