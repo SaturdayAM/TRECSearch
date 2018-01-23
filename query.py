@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Created on Mon Sep 26 00:16:32 2016
+Object to store queries
 
-@author: jerry
 """
 
 class Query:

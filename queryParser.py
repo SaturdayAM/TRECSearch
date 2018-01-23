@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+Parses the provided TREC query files.
+
+"""
 import numpy as np
 import re
 import mmap
 
 class queryParser():
-    """
-    Parses the TREC query file
-    """
-    
- 
-        
     
     def __init__(self, queryPath):
         self.queryPath = queryPath
@@ -19,8 +17,6 @@ class queryParser():
     def parseQuery(self):
         queryFile = open(self.queryPath, "r")
         queryFileText = queryFile.read()
-        #Referred to:
-        #   http://stackoverflow.com/questions/2199552/matching-multiple-line-in-python-regular-expression
         wholeQueryPattern = re.compile("(?s)<top>(.*?)<\/top>")
         self.queryArray = []
         self.queryNumbers = []        
@@ -48,12 +44,6 @@ class queryParser():
             
             #Getting the respective query numbers
             self.queryNumbers.append(numberOnlyStr)            
-            
-#            tagless = self.queryArray[i]
-#            tagless =  queryNoPattern.sub('', tagless)
-#            tagless = topicTag.sub('', tagless)
-#            tagless = descTag.sub('', tagless)
-#            tagless = narrTag.sub('', tagless)
             
             queryTitle = queryTitlePattern.findall(self.queryArray[i])
             queryTitleStr = ''.join(queryTitle)

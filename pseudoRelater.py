@@ -2,7 +2,6 @@
 """
 Implementation of pseudo-relevance feedback. 
 
-@author: jerry
 """
 import cosineVSM
 import initialCosineVSM
@@ -11,7 +10,8 @@ import heapq
 
 class pseudoRelater():
     
-    def __init__(self, queries, nTopDocs, tTopTerms, indexPath, expandedOutput, corpusPath, lexiconPath):
+    def __init__(self, queries, nTopDocs, tTopTerms, indexPath, expandedOutput,
+                 corpusPath, lexiconPath):
         self.queries = queries
         self.nTopDocs = nTopDocs
         self.tTopTerms = tTopTerms
@@ -24,15 +24,15 @@ class pseudoRelater():
         
         
     def pseudoRelate(self):
-        stopWordList = ["the", "and", "of", "to", "a", "for", "in", "be", "that", "is", "as", "on", "or", "not", "this"]                                
+        stopWordList = ["the", "and", "of", "to", "a", "for", "in", "be", 
+                        "that", "is", "as", "on", "or", "not", "this"]                                
                                 
         #Initial cosineVSM retrieval, gets the top N Documents
         print("Commencing initial cosineVSM")
-        initialRetrieval = initialCosineVSM.initialCosineVSM(self.queries, self.nTopDocs, self.indexPath, self.corpusPath, self.lexiconPath)
+        initialRetrieval = initialCosineVSM.initialCosineVSM(self.queries,
+                           self.nTopDocs, self.indexPath, self.corpusPath,
+                           self.lexiconPath)
         topNDocArray = initialRetrieval.retrieve()
-        
-            
-        #An array to correspond for each term to append things
         
         #Get just the top N Doc IDs for each of the queries
         nDocIds = []
@@ -44,7 +44,7 @@ class pseudoRelater():
                 nDocuments.append(stringTokens[1])
             nDocIds.append(nDocuments)
         
-        #Now you need to get the top terms of the top N Documents and update the queries
+        #Get top terms of the top N Documents and update queries
         parsedDocs = open(self.corpusPath)        
                 
         expandedQueries = []       
@@ -56,8 +56,6 @@ class pseudoRelater():
                         
             
             #For each top document, get the top t terms
-            #Looked up sorting dictionaries at:
-            #   http://stackoverflow.com/questions/7197315/5-maximum-values-in-a-python-dictionary
             for docId in relevantDocs:
                 regexString = "\( " + docId + "(.*?)\]\)"
                 matchedDocuments = ""
@@ -75,7 +73,9 @@ class pseudoRelater():
                             tempDocDict[token] = 1
                         else:
                             tempDocDict[token] += 1
-                topTerms = heapq.nlargest(int(self.tTopTerms), tempDocDict, key=tempDocDict.get)
+                topTerms = heapq.nlargest(int(self.tTopTerms), tempDocDict,
+                                          key=tempDocDict.get)
+
                 singleExpansion = singleExpansion + ' ' + ' '.join(topTerms)
             
             expandedQueries.append(singleExpansion)
@@ -86,7 +86,8 @@ class pseudoRelater():
             self.finalExpansions.append(expandedStr)
             
 #        #Final step is to run VSM on the expanded queries
-        secondCosineVSM = cosineVSM.cosineVSM(self.finalExpansions, self.indexPath, self.outputPath, self.corpusPath)
+        secondCosineVSM = cosineVSM.cosineVSM(self.finalExpansions,
+                          self.indexPath, self.outputPath, self.corpusPath)
         secondCosineVSM.getLexicon(self.lexiconPath)
         secondCosineVSM.retrieve()
             

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Translates documents and queries into vector space. Calculates and ranks
-searches by cosine similarity scores. Returns an array of N top documents
+searches by cosine similarity scores. Returns an array of N top documents.
+Does the same thing as the normal cosineVSM.py file.
 
 """
 import numpy as np
@@ -45,7 +46,8 @@ class initialCosineVSM():
                 numDocs += 1            
             
             
-            #Temp store each query in a dictionary for access to term freq
+            #Temp store each query in a dictionary for convenient way
+            #to count term frequencies
             queryNo = 0
             tempQueryDict = dict()
             for i, token in enumerate(query.split()):
@@ -55,20 +57,17 @@ class initialCosineVSM():
                 #Count up query term frequencies
                 else:
                     term = query.split()[i]
-#                    print("Term: " + " " + term)
-#                    termId = self.lexicon[term]
                     if term not in tempQueryDict:
                         tempQueryDict[term] = 1
                     else:
                         tempQueryDict[term] += 1
-            
 
+            #-----------------------Calculating Scores-------------------------
+            #Calculating denominator score portion for query
             queryDenomScore = 0;
-            #Calculating denominator score portion for query 
             for term in tempQueryDict:
                 #Components of our tf-idf scores
                 queryTf = tempQueryDict[term]
-                #print("query.termfrequency: " + str(queryTf))
                 termDf = 0
                 termIdf = 0                
 
@@ -80,7 +79,6 @@ class initialCosineVSM():
                 else:
                     #It is in lexicon, need to get the termID and find term Df
                     termId = str(self.lexicon[term])
-#                    print("Term: " + term)
                     
                     #use termID to get postings list.
                     #For each document key in the postings list
@@ -91,44 +89,29 @@ class initialCosineVSM():
                     #In the postings list
                     
                     #Calculate idf for the term
-                    #Looked up log function from:
-                        #   https://docs.python.org/2/library/math.html
-#                    print("termDf: " + str(termDf))
                     if termDf == 0:
                         termIdf = 0
                     else:
                         termIdf = math.log10(numDocs/termDf)
-                    
-#                    print("\nIDF of term: " + str(termIdf))
-#                    print("\n")
             
                 queryDenomScore += (queryTf*termIdf)
             
             queryDenomScore = queryDenomScore**2
             
-            #After getting query term frequencies
-#            print(str(queryNo) + "|" + json.dumps(tempQueryDict))
-            #For each term in the dictionary, get the postings list in the index
-#            print("Calculating doc scores:\n")
+            #After getting query term frequencies,
+            #for each term in the dictionary, get the postings list in index
             for term in tempQueryDict:
-                #print("\nFor: " + term)
-                
                 #Components of our tf-idf scores
                 queryTf = tempQueryDict[term]
-                #print("query.termfrequency: " + str(queryTf))
                 termDf = 0
                 termIdf = 0                
 
-                
-                #If the term is not in the lexicon, then the Df will be 0 and score
-                #will not be affected
                 if term not in self.lexicon:
                     termDf = 0
                 else:
-                    #It is in lexicon, need to get the termID and find term Df
+                    #It is in lexicon - need to get the termID and find term Df
                     termId = str(self.lexicon[term])
-#                    print("Term: " + term)
-                    
+
                     #use termID to get postings list.
                     #For each document key in the postings list
                     for document in self.index[termId]:
@@ -138,46 +121,24 @@ class initialCosineVSM():
                     #In the postings list
                     
                     #Calculate idf for the term
-                    #Looked up log function from:
-                        #   https://docs.python.org/2/library/math.html
-#                    print("termDf: " + str(termDf))
                     if termDf == 0:
                         termIdf = 0
                     else:
                         termIdf = math.log10(numDocs/termDf)
                     
-#                    print("\nIDF of term: " + str(termIdf))
-#                    print("\n")
-                    
                     for document in self.index[termId]:
-#                        if document == "FR940810-0-00143":
-#                            print("Document: FR940810-0-00143")
-                        
-                        #print("Document: " + document)                        
+                                             
                         docTf = self.index[termId][document]
-#                        if document ==  "FR940810-0-00143":
-#                            print("DocTf: " + str(docTf))
-                                                
                               
-                        #print("Tf: " + str(docTf) + "\n")
                         numerator = (queryTf*termIdf)*(docTf*termIdf)
                         denomPartOne = (docTf*termIdf)**2
                         
-                        #update the relevant components of cosineVSM in the scores dictionary
-                        
-#                        if document ==  "FR940810-0-00143": 
-#                            print("Updating numerator by: " + str(numerator))
-#                            print("Updating denomOne by: " + str(denomPartOne))
-#                            print("Updating denomTwo by: " + str(queryDenomScore))
-                        
-                        
+                        #update the relevant components of cosineVSM   
                         docScores[document]['numerator'] += numerator
                         docScores[document]['denomOne'] += denomPartOne
                         docScores[document]['denomTwo'] = queryDenomScore
 
             for document in docScores:
-                #looked up sqrt() from:
-                #   https://www.tutorialspoint.com/python/number_sqrt.htm
                 numerator = docScores[document]['numerator']
                 denomOne = docScores[document]['denomOne']
                 denomTwo = docScores[document]['denomTwo']
@@ -190,23 +151,19 @@ class initialCosineVSM():
                     finalScore = numerator/denominator
                 docScores[document]['finalScore'] = finalScore
                 
-#            print("Final score for  FR940810-0-00143: " + str(docScores["FR940810-0-00143"]['finalScore']))
-#            print("Numerator for  FR940810-0-00143: " + str(docScores["FR940810-0-00143"]['numerator']))
-#            print("denomOne for  FR940810-0-00143: " + str(docScores["FR940810-0-00143"]['denomOne']))
-#            print("denomTwo for  FR940810-0-00143: " + str(docScores["FR940810-0-00143"]['denomTwo']))
-#            
-#            print("Final score for  FR940617-2-00227: " + str(docScores["FR940617-2-00227"]['finalScore']))
             
             #Now, for each given query, we need to get the top 100 results
             #First, add the documents with their scores into our array
             for document in docScores:
-                #Create string with the query number, document number, and the score
-                rankingString = str(queryNo) + " " + document + " " + str(docScores[document]['finalScore']) 
+                #Create string with the query number, doc number, and score
+                rankingString = (str(queryNo) + " " + document + " " 
+                                + str(docScores[document]['finalScore']))
                 #Append to array
                 docRankings.append(rankingString)
                 
             #Sort the array
-                docRankings.sort(key=lambda line: float(line.split()[2]), reverse = True)
+                docRankings.sort(key=lambda line: float(line.split()[2]),
+                                 reverse = True)
             
             topNDocs = docRankings[:self.nTopDocs]            
             
